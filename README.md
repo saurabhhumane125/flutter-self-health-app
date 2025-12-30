@@ -26,3 +26,21 @@ Screenshots are available in the `screenshots/` folder.
 ```bash
 flutter pub get
 flutter run -d chrome
+
+## Screenshots
+(Add screenshots of Mood Screen + History Screen)
+
+## Animations & UX
+- Animated mood selection (scale + color transition)
+- Smooth page transitions
+- Streak indicator animation
+
+## Tech Stack
+- Flutter
+- Material 3
+- Shared Preferences (local persistence)
+
+## Why this project?
+Built to demonstrate clean UI, animations, state handling,
+and real-world feature thinking for a health-focused app.
+
