@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../widgets/goal_tile.dart';
+import '../widgets/progress_card.dart';
+
 class DailyGoal {
   final String id;
   final String title;
@@ -24,13 +27,14 @@ class DailyGoalsScreen extends StatefulWidget {
 }
 
 class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
-  late List<DailyGoal> goals;
   late String todayKey;
+  late List<DailyGoal> goals;
 
   @override
   void initState() {
     super.initState();
     todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
     goals = [
       DailyGoal(id: 'sleep', title: 'Sleep well', icon: Icons.bedtime),
       DailyGoal(
@@ -42,72 +46,66 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
       DailyGoal(
           id: 'screen', title: 'Less screen time', icon: Icons.phone_android),
     ];
+
     _loadGoals();
   }
 
   int get completedCount => goals.where((g) => g.completed).length;
-
   double get progress => completedCount / goals.length;
 
   String get insightText {
-    if (progress == 0) return "Let’s start fresh 🌱";
-    if (progress < 0.5) return "Good effort, keep going 🙂";
-    if (progress < 1) return "Great self-care today 💪";
-    return "Perfect day! 🌟";
+    if (completedCount == goals.length) {
+      return 'Perfect day! Keep the streak alive 🔥';
+    }
+    if (completedCount >= 3) {
+      return 'Great job! You’re on track 👍';
+    }
+    return 'Small steps matter. Stay consistent 🌱';
   }
 
   Future<void> _loadGoals() async {
     final prefs = await SharedPreferences.getInstance();
-    for (var goal in goals) {
-      goal.completed = prefs.getBool('${goal.id}_$todayKey') ?? false;
-    }
-    setState(() {});
+    setState(() {
+      for (var g in goals) {
+        g.completed = prefs.getBool('$todayKey-${g.id}') ?? false;
+      }
+    });
   }
 
   Future<void> _toggleGoal(DailyGoal goal) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       goal.completed = !goal.completed;
+      prefs.setBool('$todayKey-${goal.id}', goal.completed);
     });
-    await prefs.setBool('${goal.id}_$todayKey', goal.completed);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9F8),
       appBar: AppBar(
-        title: const Text('Daily Goals'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-        elevation: 0,
+        title: const Text('Daily Health Goals'),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _ProgressCard(
-              progress: progress,
-              completed: completedCount,
-              total: goals.length,
-              insight: insightText,
+      body: Column(
+        children: [
+          ProgressCard(
+            progress: progress,
+            text: insightText,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: goals.length,
+              itemBuilder: (context, index) {
+                return GoalTile(
+                  goal: goals[index],
+                  onTap: () => _toggleGoal(goals[index]),
+                );
+              },
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.separated(
-                itemCount: goals.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final goal = goals[index];
-                  return _GoalTile(
-                    goal: goal,
-                    onTap: () => _toggleGoal(goal),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

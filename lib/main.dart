@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'screens/mood_screen.dart';
+import 'screens/daily_goals_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const SelfHealthApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SelfHealthApp extends StatelessWidget {
+  const SelfHealthApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Self Health Recorder',
+      title: 'Self Health',
       theme: ThemeData(
-        primaryColor: const Color(0xFF4CAF93),
-        scaffoldBackgroundColor: const Color(0xFFF5FBF8),
         useMaterial3: true,
+        colorSchemeSeed: const Color(0xFF4CAF93),
+        scaffoldBackgroundColor: const Color(0xFFF4FBF8),
       ),
-      home: const MoodScreen(),
+      home: const DailyGoalsScreen(),
     );
   }
 }
